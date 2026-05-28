@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Privacy Policy — Nearby Finder</title>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; max-width: 800px; margin: 40px auto; padding: 0 20px; color: #1f2937; line-height: 1.7; }
+    h1 { color: #0a7ea4; border-bottom: 2px solid #e5e7eb; padding-bottom: 12px; }
+    h2 { color: #374151; margin-top: 32px; }
+    h3 { color: #4b5563; margin-top: 20px; }
+    p, li { color: #4b5563; }
+    a { color: #0a7ea4; }
+    .updated { color: #9ca3af; font-size: 14px; }
+    table { width: 100%; border-collapse: collapse; margin: 16px 0; }
+    th { background: #f3f4f6; text-align: left; padding: 10px 12px; font-size: 13px; color: #374151; border: 1px solid #e5e7eb; }
+    td { padding: 10px 12px; font-size: 14px; color: #4b5563; border: 1px solid #e5e7eb; vertical-align: top; }
+  </style>
+</head>
+<body>
+
+  <h1>Privacy Policy</h1>
+  <p class="updated">Last updated: May 28, 2026</p>
+
+  <p>
+    <strong>Nearby Finder</strong> ("the App") is a free mobile application that helps users
+    discover nearby places of interest — including petrol pumps, temples, washrooms, parking areas,
+    metro stations, hospitals, ATMs, and restaurants. This Privacy Policy explains what information
+    we collect, how we use it, and your rights.
+  </p>
+
+  <h2>1. Information We Collect</h2>
+
+  <h3>Location Data</h3>
+  <p>
+    The App requests access to your device's precise location (<code>ACCESS_FINE_LOCATION</code>)
+    only while you are actively using the App ("foreground" access). Your location is used
+    solely to find nearby places and calculate driving distances. We do <strong>not</strong>
+    store, log, or transmit your location to our own servers. Location coordinates are sent
+    directly from your device to third-party APIs (listed below) to perform the search.
+  </p>
+
+  <h3>Recent Searches</h3>
+  <p>
+    The App stores your last 5 search locations <strong>locally on your device</strong> using
+    device storage (<code>AsyncStorage</code>). This data never leaves your device and is not
+    accessible to us. You can clear it at any time using the "Clear" button in the app.
+  </p>
+
+  <h3>Theme Preference</h3>
+  <p>
+    Your chosen display theme (light or dark mode) is saved locally on your device. This
+    preference is not transmitted anywhere.
+  </p>
+
+  <h3>No Account or Personal Data</h3>
+  <p>
+    The App does not require you to create an account. We do not collect your name, email
+    address, phone number, or any other personal identifier.
+  </p>
+
+  <h3>No Analytics or Advertising</h3>
+  <p>
+    We do not use any analytics SDKs, advertising SDKs, or crash-reporting tools that collect
+    personal data.
+  </p>
+
+  <h2>2. Third-Party Services</h2>
+  <p>The App communicates with the following third-party services to function:</p>
+
+  <table>
+    <tr>
+      <th>Service</th>
+      <th>Purpose</th>
+      <th>Data Sent</th>
+      <th>Privacy Policy</th>
+    </tr>
+    <tr>
+      <td><strong>Google Places API</strong></td>
+      <td>Find nearby places (petrol pumps, hospitals, restaurants, etc.) and provide address autocomplete suggestions</td>
+      <td>Your location coordinates and search text</td>
+      <td><a href="https://policies.google.com/privacy" target="_blank">Google Privacy Policy</a></td>
+    </tr>
+    <tr>
+      <td><strong>Google Geocoding API</strong></td>
+      <td>Convert a selected address or landmark into geographic coordinates</td>
+      <td>Selected place ID or address text</td>
+      <td><a href="https://policies.google.com/privacy" target="_blank">Google Privacy Policy</a></td>
+    </tr>
+    <tr>
+      <td><strong>Google Maps (deep link)</strong></td>
+      <td>Open navigation when you tap "Open in Google Maps"</td>
+      <td>Destination coordinates only (handled by the Google Maps app on your device)</td>
+      <td><a href="https://policies.google.com/privacy" target="_blank">Google Privacy Policy</a></td>
+    </tr>
+    <tr>
+      <td><strong>OSRM (Open Source Routing Machine)</strong></td>
+      <td>Calculate driving distance and estimated travel time to each place</td>
+      <td>Origin and destination coordinates</td>
+      <td><a href="https://project-osrm.org/" target="_blank">OSRM Project</a></td>
+    </tr>
+    <tr>
+      <td><strong>Overpass API / OpenStreetMap</strong> (fallback)</td>
+      <td>Used as a fallback data source when Google Places is unavailable</td>
+      <td>Your location coordinates</td>
+      <td><a href="https://wiki.osmfoundation.org/wiki/Privacy_Policy" target="_blank">OSM Privacy Policy</a></td>
+    </tr>
+  </table>
+
+  <h2>3. How We Use Your Data</h2>
+  <ul>
+    <li>To find places of interest within 5 km of your current or searched location.</li>
+    <li>To calculate driving distance and estimated travel time to each place.</li>
+    <li>To show address suggestions as you type a location.</li>
+    <li>To remember your last 5 searches locally for your convenience.</li>
+    <li>To remember your display theme preference locally.</li>
+  </ul>
+  <p>We do not use your data for advertising, profiling, or any purpose beyond the above.</p>
+
+  <h2>4. Data Storage and Retention</h2>
+  <p>
+    The App does not operate any backend server or database. All app data (recent searches,
+    theme preference) is stored exclusively on your device and is removed when you uninstall
+    the App. No location data or search history is retained by us.
+  </p>
+
+  <h2>5. Data Safety (Google Play)</h2>
+  <p>In accordance with Google Play's Data Safety requirements:</p>
+  <ul>
+    <li><strong>Location (approximate and precise):</strong> Collected, used in-app only, not shared with third parties beyond the APIs listed above, not stored on our servers.</li>
+    <li><strong>Search history:</strong> Stored locally on-device only. Not shared or transmitted.</li>
+    <li><strong>No data is sold</strong> to third parties.</li>
+    <li><strong>No personal data</strong> (name, email, phone, identifiers) is collected.</li>
+  </ul>
+
+  <h2>6. Children's Privacy</h2>
+  <p>
+    The App is not directed at children under the age of 13. We do not knowingly collect
+    personal information from children.
+  </p>
+
+  <h2>7. Your Rights</h2>
+  <p>You can manage your data at any time:</p>
+  <ul>
+    <li><strong>Revoke location permission:</strong> Settings → Apps → Nearby Finder → Permissions. The App will still work for manual location search without the permission.</li>
+    <li><strong>Clear recent searches:</strong> Tap "Clear" next to the Recent Searches section in the App.</li>
+    <li><strong>Delete all local data:</strong> Uninstall the App from your device.</li>
+  </ul>
+
+  <h2>8. Changes to This Policy</h2>
+  <p>
+    We may update this Privacy Policy from time to time. Changes will be reflected by updating
+    the "Last updated" date above. Continued use of the App after changes constitutes acceptance
+    of the updated policy.
+  </p>
+
+  <h2>9. Contact Us</h2>
+  <p>
+    If you have questions about this Privacy Policy, please contact us at:<br />
+    <a href="mailto:yogeshsharma113@yahoo.com">yogeshsharma113@yahoo.com</a>
+  </p>
+
+</body>
+</html>
