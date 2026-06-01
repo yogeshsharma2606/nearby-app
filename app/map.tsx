@@ -2,28 +2,36 @@ import React, { useState, useRef } from 'react';
 import {
   View,
   StyleSheet,
-  Text,
   TouchableOpacity,
   Modal,
-  SafeAreaView,
 } from 'react-native';
 import MapView, { UrlTile, PROVIDER_DEFAULT } from 'react-native-maps';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { usePlaces } from '../context/PlacesContext';
 import { useTheme } from '../context/ThemeContext';
 import { PlaceMarker } from '../components/PlaceMarker';
 import { PlaceDetailSheet } from '../components/PlaceDetailSheet';
+import { CategoryIcon } from '../components/CategoryIcon';
+import { AppIcon } from '../components/AppIcon';
+import { ThemedText } from '../components/ThemedText';
 import type { NearbyPlace } from '../types/place';
 
-// CARTO free tiles — no API key, no usage policy restrictions
 const MAP_TILE_URL = 'https://a.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png';
 
 export default function MapScreen() {
   const router = useRouter();
   const { places, userLocation, selectedCategory } = usePlaces();
   const { theme } = useTheme();
+  const c = theme.colors;
+  const insets = useSafeAreaInsets();
   const [selectedPlace, setSelectedPlace] = useState<NearbyPlace | null>(null);
   const mapRef = useRef<MapView>(null);
+
+  if (!selectedCategory) {
+    router.replace('/');
+    return null;
+  }
 
   const region = userLocation
     ? {
@@ -52,16 +60,24 @@ export default function MapScreen() {
     );
   }
 
+  const countLabel =
+    places.length !== 1 ? selectedCategory.labelPlural : selectedCategory.label;
+
   return (
-    <SafeAreaView style={styles.container}>
-      {/* Count badge */}
-      {places.length > 0 && (
-        <View style={styles.badge}>
-          <Text style={styles.badgeText}>
-            {selectedCategory.emoji} {places.length} {places.length !== 1 ? selectedCategory.labelPlural : selectedCategory.label} found
-          </Text>
-        </View>
-      )}
+    <View style={styles.container}>
+      <View style={[styles.topBar, { top: insets.top + 8 }]}>
+        <TouchableOpacity style={styles.backFab} onPress={() => router.back()} activeOpacity={0.85}>
+          <AppIcon name="chevron-back" size={26} color="#1E293B" />
+        </TouchableOpacity>
+        {places.length > 0 && (
+          <View style={[styles.badge, { backgroundColor: c.primary }]}>
+            <CategoryIcon categoryId={selectedCategory.id} size={16} color="#FFFFFF" />
+            <ThemedText variant="captionMedium" color="#FFFFFF" style={styles.badgeText}>
+              {places.length} {countLabel} found
+            </ThemedText>
+          </View>
+        )}
+      </View>
 
       <MapView
         ref={mapRef}
@@ -71,25 +87,23 @@ export default function MapScreen() {
         showsUserLocation
         showsMyLocationButton={false}
       >
-        {/* CARTO tile layer — free, no API key required */}
         <UrlTile urlTemplate={MAP_TILE_URL} maximumZ={19} flipY={false} />
 
-        {/* Place markers */}
         {places.map((place) => (
           <PlaceMarker
             key={place.id}
             place={place}
-            categoryEmoji={selectedCategory.emoji}
+            categoryId={selectedCategory.id}
+            pinColor={c.primary}
             onPress={setSelectedPlace}
           />
         ))}
       </MapView>
 
-      {/* Floating controls */}
-      <View style={styles.controls}>
+      <View style={[styles.controls, { bottom: 16 + insets.bottom }]}>
         {userLocation && (
           <TouchableOpacity style={styles.fab} onPress={focusUser} activeOpacity={0.85}>
-            <Text style={styles.fabIcon}>📍</Text>
+            <AppIcon name="locate" size={24} color={c.primary} />
           </TouchableOpacity>
         )}
         <TouchableOpacity
@@ -97,23 +111,21 @@ export default function MapScreen() {
           onPress={() => router.push('/list')}
           activeOpacity={0.85}
         >
-          <Text style={styles.fabIcon}>📋</Text>
+          <AppIcon name="list" size={24} color={c.primary} />
         </TouchableOpacity>
       </View>
 
-      {/* Empty state */}
       {places.length === 0 && (
-        <View style={styles.emptyOverlay}>
-          <Text style={styles.emptyText}>
+        <View style={[styles.emptyOverlay, { backgroundColor: c.card }]}>
+          <ThemedText variant="body" color={c.textSecondary} style={{ textAlign: 'center' }}>
             No {selectedCategory.labelPlural.toLowerCase()} found in this area.
-          </Text>
+          </ThemedText>
           <TouchableOpacity onPress={() => router.back()}>
-            <Text style={styles.emptyLink}>Try again</Text>
+            <ThemedText variant="bodyMedium" color={c.primary}>Try again</ThemedText>
           </TouchableOpacity>
         </View>
       )}
 
-      {/* Place detail bottom sheet */}
       <Modal
         visible={selectedPlace !== null}
         transparent
@@ -121,54 +133,66 @@ export default function MapScreen() {
         onRequestClose={() => setSelectedPlace(null)}
       >
         <TouchableOpacity
-          style={styles.modalOverlay}
+          style={[styles.modalOverlay, { backgroundColor: c.overlay }]}
           activeOpacity={1}
           onPress={() => setSelectedPlace(null)}
         />
         {selectedPlace && (
           <PlaceDetailSheet
             place={selectedPlace}
-            categoryEmoji={selectedCategory.emoji}
+            categoryId={selectedCategory.id}
             onClose={() => setSelectedPlace(null)}
             theme={theme}
           />
         )}
       </Modal>
-    </SafeAreaView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#000',
-  },
-  map: {
-    flex: 1,
-  },
-  badge: {
+  container: { flex: 1, backgroundColor: '#000' },
+  map: { flex: 1 },
+  topBar: {
     position: 'absolute',
-    top: 14,
-    alignSelf: 'center',
+    left: 12,
+    right: 12,
     zIndex: 10,
-    backgroundColor: 'rgba(10,126,164,0.92)',
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+  },
+  backFab: {
+    width: 40,
+    height: 40,
     borderRadius: 20,
-    paddingHorizontal: 14,
-    paddingVertical: 7,
+    backgroundColor: '#fff',
+    alignItems: 'center',
+    justifyContent: 'center',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
     shadowRadius: 6,
     elevation: 6,
   },
-  badgeText: {
-    color: '#fff',
-    fontWeight: '700',
-    fontSize: 13,
+  badge: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    borderRadius: 20,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 6,
+    elevation: 6,
   },
+  badgeText: { textAlign: 'center' },
   controls: {
     position: 'absolute',
-    bottom: 28,
     right: 16,
     gap: 12,
   },
@@ -185,37 +209,20 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     elevation: 8,
   },
-  fabIcon: {
-    fontSize: 24,
-  },
   emptyOverlay: {
     position: 'absolute',
     bottom: 40,
     left: 24,
     right: 24,
-    backgroundColor: '#fff',
     borderRadius: 16,
     padding: 20,
     alignItems: 'center',
+    gap: 8,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.1,
     shadowRadius: 12,
     elevation: 8,
   },
-  emptyText: {
-    fontSize: 15,
-    color: '#374151',
-    marginBottom: 8,
-    textAlign: 'center',
-  },
-  emptyLink: {
-    color: '#0a7ea4',
-    fontWeight: '700',
-    fontSize: 15,
-  },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.4)',
-  },
+  modalOverlay: { flex: 1 },
 });

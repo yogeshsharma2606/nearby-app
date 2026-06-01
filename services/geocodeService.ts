@@ -33,7 +33,7 @@ interface AutocompleteResponse {
 export async function getPlaceSuggestions(
   input: string,
 ): Promise<Array<{ placeId: string; label: string }>> {
-  if (!input || input.trim().length < 5) return [];
+  if (!input || input.trim().length < 4) return [];
 
   const params = new URLSearchParams({
     input: input.trim(),

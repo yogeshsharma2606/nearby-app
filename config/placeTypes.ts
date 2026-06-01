@@ -8,6 +8,8 @@ export interface PlaceCategory {
   googleType?: string;
   /** Optional keyword for Google Places when type alone is insufficient */
   keyword?: string;
+  /** Search radius in metres (default 5000 in hook) */
+  searchRadiusM?: number;
   /** Overpass API tag used as fallback when Google key is not set */
   overpassTag: string;
 }
@@ -44,6 +46,7 @@ export const PLACE_CATEGORIES: PlaceCategory[] = [
     labelPlural: 'Parking Areas',
     emoji: '🅿️',
     googleType: 'parking',
+    keyword: 'parking lot public parking car park',
     overpassTag: 'amenity=parking',
   },
   {
@@ -76,8 +79,17 @@ export const PLACE_CATEGORIES: PlaceCategory[] = [
     labelPlural: 'Restaurants',
     emoji: '🍽️',
     googleType: 'restaurant',
+    searchRadiusM: 8000,
     overpassTag: 'amenity=restaurant',
   },
 ];
 
-export const DEFAULT_CATEGORY = PLACE_CATEGORIES[0];
+/** Drop car-repair “garages” when user asked for parking lots */
+export function isLikelyParkingPlace(name: string): boolean {
+  const n = name.toLowerCase();
+  if (/parking|car park|parkade|parking lot|multilevel parking/i.test(n)) return true;
+  if (/repair|workshop|mechanic|service centre|service center|auto care|body shop/i.test(n)) return false;
+  if (/\bgarage\b/i.test(n) && !/parking/i.test(n)) return false;
+  return true;
+}
+

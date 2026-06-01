@@ -1,16 +1,21 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, StyleSheet } from 'react-native';
 import { Marker, Callout } from 'react-native-maps';
 import type { NearbyPlace } from '../types/place';
 import { formatDistance, formatDuration } from '../services/osrmService';
+import { CategoryIcon } from './CategoryIcon';
+import { ThemedText } from './ThemedText';
+import { AppIcon } from './AppIcon';
+import { FONT } from '../theme/typography';
 
 interface Props {
   place: NearbyPlace;
-  categoryEmoji: string;
+  categoryId: string;
+  pinColor?: string;
   onPress: (place: NearbyPlace) => void;
 }
 
-export function PlaceMarker({ place, categoryEmoji, onPress }: Props) {
+export function PlaceMarker({ place, categoryId, pinColor = '#0E7490', onPress }: Props) {
   return (
     <Marker
       coordinate={{ latitude: place.lat, longitude: place.lon }}
@@ -18,24 +23,27 @@ export function PlaceMarker({ place, categoryEmoji, onPress }: Props) {
       onPress={() => onPress(place)}
     >
       <View style={styles.markerContainer}>
-        <View style={styles.pin}>
-          <Text style={styles.pinIcon}>{categoryEmoji}</Text>
+        <View style={[styles.pin, { backgroundColor: pinColor, borderColor: '#fff' }]}>
+          <CategoryIcon categoryId={categoryId} size={22} color="#FFFFFF" />
         </View>
-        <View style={styles.pinTail} />
+        <View style={[styles.pinTail, { borderTopColor: pinColor }]} />
       </View>
 
       <Callout tooltip>
         <View style={styles.callout}>
-          <Text style={styles.calloutName} numberOfLines={1}>
+          <ThemedText variant="captionMedium" color="#111827" numberOfLines={1} style={styles.calloutName}>
             {place.name}
-          </Text>
-          <Text style={styles.calloutMeta}>
+          </ThemedText>
+          <ThemedText variant="captionMedium" color={pinColor} style={styles.calloutMeta}>
             {formatDistance(place.distance)} · {formatDuration(place.duration)}
-          </Text>
+          </ThemedText>
           {place.rating !== null && (
-            <Text style={styles.calloutRating}>⭐ {place.rating.toFixed(1)}</Text>
+            <View style={styles.ratingRow}>
+              <AppIcon name="star" size={12} color="#D97706" />
+              <ThemedText variant="caption" color="#92400E">{place.rating.toFixed(1)}</ThemedText>
+            </View>
           )}
-          <Text style={styles.calloutHint}>Tap for details</Text>
+          <ThemedText variant="caption" color="#9CA3AF">Tap for details</ThemedText>
         </View>
       </Callout>
     </Marker>
@@ -43,25 +51,20 @@ export function PlaceMarker({ place, categoryEmoji, onPress }: Props) {
 }
 
 const styles = StyleSheet.create({
-  markerContainer: {
-    alignItems: 'center',
-  },
+  markerContainer: { alignItems: 'center' },
   pin: {
     width: 44,
     height: 44,
     borderRadius: 22,
-    backgroundColor: '#0a7ea4',
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 3,
-    borderColor: '#fff',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 3 },
     shadowOpacity: 0.25,
     shadowRadius: 6,
     elevation: 6,
   },
-  pinIcon: { fontSize: 22 },
   pinTail: {
     width: 0,
     height: 0,
@@ -70,7 +73,6 @@ const styles = StyleSheet.create({
     borderTopWidth: 10,
     borderLeftColor: 'transparent',
     borderRightColor: 'transparent',
-    borderTopColor: '#0a7ea4',
     marginTop: -2,
   },
   callout: {
@@ -85,25 +87,7 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     elevation: 8,
   },
-  calloutName: {
-    fontSize: 13,
-    fontWeight: '700',
-    color: '#111827',
-    marginBottom: 4,
-  },
-  calloutMeta: {
-    fontSize: 12,
-    color: '#0a7ea4',
-    fontWeight: '600',
-    marginBottom: 2,
-  },
-  calloutRating: {
-    fontSize: 12,
-    color: '#92400e',
-    marginBottom: 2,
-  },
-  calloutHint: {
-    fontSize: 11,
-    color: '#9ca3af',
-  },
+  calloutName: { fontFamily: FONT.semiBold, marginBottom: 4 },
+  calloutMeta: { marginBottom: 4 },
+  ratingRow: { flexDirection: 'row', alignItems: 'center', gap: 4, marginBottom: 4 },
 });

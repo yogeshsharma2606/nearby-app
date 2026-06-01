@@ -1,16 +1,23 @@
 import React, { useEffect, useState } from 'react';
 import {
-  View, Text, StyleSheet, TouchableOpacity,
+  View, StyleSheet, TouchableOpacity,
   Linking, Platform, ScrollView, ActivityIndicator,
 } from 'react-native';
+import { ThemedText } from './ThemedText';
+import { CategoryIcon } from './CategoryIcon';
+import { AppIcon } from './AppIcon';
+import type { ComponentProps } from 'react';
+import { Ionicons } from '@expo/vector-icons';
 import type { NearbyPlace } from '../types/place';
 import type { AppTheme } from '../context/ThemeContext';
 import { formatDistance, formatDuration } from '../services/osrmService';
 import { fetchPlaceDetails } from '../services/placesService';
 
+type IonName = ComponentProps<typeof Ionicons>['name'];
+
 interface Props {
   place: NearbyPlace;
-  categoryEmoji: string;
+  categoryId: string;
   onClose: () => void;
   theme: AppTheme;
 }
@@ -25,7 +32,7 @@ function openInGoogleMaps(lat: number, lon: number, name: string) {
   Linking.openURL(url ?? `https://www.google.com/maps/dir/?api=1&destination=${lat},${lon}`);
 }
 
-export function PlaceDetailSheet({ place, categoryEmoji, onClose, theme }: Props) {
+export function PlaceDetailSheet({ place, categoryId, onClose, theme }: Props) {
   const c = theme.colors;
   const [weekdayHours, setWeekdayHours] = useState<string[] | null>(place.weekdayHours);
   const [loadingHours, setLoadingHours] = useState(false);
@@ -48,12 +55,12 @@ export function PlaceDetailSheet({ place, categoryEmoji, onClose, theme }: Props
         {/* Header */}
         <View style={styles.header}>
           <View style={[styles.iconCircle, { backgroundColor: c.primaryLight }]}>
-            <Text style={styles.iconText}>{categoryEmoji}</Text>
+            <CategoryIcon categoryId={categoryId} size={28} color={c.primary} />
           </View>
           <View style={styles.headerText}>
-            <Text style={[styles.name, { color: c.textPrimary }]} numberOfLines={2}>{place.name}</Text>
+            <ThemedText variant="title" color={c.textPrimary} numberOfLines={2}>{place.name}</ThemedText>
             {place.brand && place.brand !== place.name && (
-              <Text style={[styles.brand, { color: c.textSecondary }]}>{place.brand}</Text>
+              <ThemedText variant="caption" color={c.textSecondary}>{place.brand}</ThemedText>
             )}
           </View>
         </View>
@@ -62,7 +69,10 @@ export function PlaceDetailSheet({ place, categoryEmoji, onClose, theme }: Props
         <View style={styles.badgeRow}>
           {place.rating !== null && (
             <View style={[styles.badge, { backgroundColor: c.warningLight, borderColor: c.warning }]}>
-              <Text style={[styles.badgeText, { color: c.warning }]}>⭐ {place.rating.toFixed(1)}</Text>
+              <View style={styles.starRow}>
+                <AppIcon name="star" size={14} color={c.warning} />
+                <ThemedText variant="captionMedium" color={c.warning}>{place.rating.toFixed(1)}</ThemedText>
+              </View>
             </View>
           )}
           {place.openNow !== null && (
@@ -72,34 +82,36 @@ export function PlaceDetailSheet({ place, categoryEmoji, onClose, theme }: Props
                 ? { backgroundColor: c.successLight, borderColor: c.success }
                 : { backgroundColor: c.dangerLight, borderColor: c.danger },
             ]}>
-              <Text style={[styles.badgeText, { color: place.openNow ? c.success : c.danger }]}>
-                {place.openNow ? '● Open now' : '● Closed now'}
-              </Text>
+              <ThemedText variant="captionMedium" color={place.openNow ? c.success : c.danger}>
+                {place.openNow ? 'Open now' : 'Closed now'}
+              </ThemedText>
             </View>
           )}
         </View>
 
         {/* Info Section */}
         <View style={[styles.infoSection, { backgroundColor: c.inputBackground, borderColor: c.border }]}>
-          <InfoRow icon="📍" label="Address" value={place.address} c={c} />
-          <InfoRow icon="📏" label="Distance" value={formatDistance(place.distance)} c={c} />
-          <InfoRow icon="⏱️" label="Drive Time" value={formatDuration(place.duration)} c={c} />
+          <InfoRow icon="location-outline" label="Address" value={place.address} c={c} />
+          <InfoRow icon="navigate-outline" label="Distance" value={formatDistance(place.distance)} c={c} />
+          <InfoRow icon="time-outline" label="Drive Time" value={formatDuration(place.duration)} c={c} />
 
           {/* Weekly hours */}
           <View style={[styles.infoRow, { borderBottomWidth: 0 }]}>
-            <Text style={styles.infoIcon}>🕐</Text>
+            <View style={styles.infoIconWrap}>
+              <AppIcon name="calendar-outline" size={20} color={c.primary} />
+            </View>
             <View style={styles.infoContent}>
-              <Text style={[styles.infoLabel, { color: c.textMuted }]}>Timings</Text>
+              <ThemedText variant="sectionLabel" color={c.textMuted}>Timings</ThemedText>
               {loadingHours ? (
                 <ActivityIndicator size="small" color={c.primary} style={{ marginTop: 4 }} />
               ) : weekdayHours && weekdayHours.length > 0 ? (
                 weekdayHours.map((line, i) => (
-                  <Text key={i} style={[styles.infoValue, { color: c.textPrimary }]}>{line}</Text>
+                  <ThemedText key={i} variant="body" color={c.textPrimary}>{line}</ThemedText>
                 ))
               ) : (
-                <Text style={[styles.infoValue, { color: c.textPrimary }]}>
+                <ThemedText variant="body" color={c.textPrimary}>
                   {place.openingHours ?? 'Not available'}
-                </Text>
+                </ThemedText>
               )}
             </View>
           </View>
@@ -111,12 +123,12 @@ export function PlaceDetailSheet({ place, categoryEmoji, onClose, theme }: Props
           onPress={() => openInGoogleMaps(place.lat, place.lon, place.name)}
           activeOpacity={0.85}
         >
-          <Text style={styles.navBtnIcon}>🗺️</Text>
-          <Text style={styles.navBtnText}>Open in Google Maps</Text>
+          <AppIcon name="navigate" size={20} color="#FFFFFF" />
+          <ThemedText variant="button" color="#FFFFFF">Open in Google Maps</ThemedText>
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.closeBtn} onPress={onClose} activeOpacity={0.7}>
-          <Text style={[styles.closeBtnText, { color: c.textSecondary }]}>Close</Text>
+          <ThemedText variant="bodyMedium" color={c.textSecondary}>Close</ThemedText>
         </TouchableOpacity>
       </ScrollView>
     </View>
@@ -124,15 +136,17 @@ export function PlaceDetailSheet({ place, categoryEmoji, onClose, theme }: Props
 }
 
 function InfoRow({ icon, label, value, c }: {
-  icon: string; label: string; value: string;
+  icon: IonName; label: string; value: string;
   c: AppTheme['colors'];
 }) {
   return (
-    <View style={styles.infoRow}>
-      <Text style={styles.infoIcon}>{icon}</Text>
+    <View style={[styles.infoRow, { borderBottomColor: c.border }]}>
+      <View style={styles.infoIconWrap}>
+        <AppIcon name={icon} size={20} color={c.primary} />
+      </View>
       <View style={styles.infoContent}>
-        <Text style={[styles.infoLabel, { color: c.textMuted }]}>{label}</Text>
-        <Text style={[styles.infoValue, { color: c.textPrimary }]}>{value}</Text>
+        <ThemedText variant="sectionLabel" color={c.textMuted}>{label}</ThemedText>
+        <ThemedText variant="body" color={c.textPrimary}>{value}</ThemedText>
       </View>
     </View>
   );
@@ -153,14 +167,10 @@ const styles = StyleSheet.create({
     width: 56, height: 56, borderRadius: 28,
     alignItems: 'center', justifyContent: 'center', flexShrink: 0,
   },
-  iconText: { fontSize: 28 },
   headerText: { flex: 1 },
-  name: { fontSize: 19, fontWeight: '800', lineHeight: 26 },
-  brand: { fontSize: 13, marginTop: 2 },
-
   badgeRow: { flexDirection: 'row', gap: 8, marginBottom: 18, flexWrap: 'wrap' },
   badge: { borderRadius: 10, paddingHorizontal: 12, paddingVertical: 6, borderWidth: 1 },
-  badgeText: { fontSize: 13, fontWeight: '700' },
+  starRow: { flexDirection: 'row', alignItems: 'center', gap: 4 },
 
   infoSection: {
     borderRadius: 18, paddingVertical: 4,
@@ -171,17 +181,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16, paddingVertical: 13,
     gap: 12, borderBottomWidth: 1, borderBottomColor: 'transparent',
   },
-  infoIcon: { fontSize: 18, width: 26, textAlign: 'center', marginTop: 1 },
+  infoIconWrap: { width: 28, alignItems: 'center', marginTop: 1 },
   infoContent: { flex: 1 },
-  infoLabel: { fontSize: 11, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 0.6, marginBottom: 3 },
-  infoValue: { fontSize: 14, lineHeight: 20 },
-
   navBtn: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
-    paddingVertical: 17, borderRadius: 16, gap: 8, marginBottom: 12,
+    gap: 8, paddingVertical: 17, borderRadius: 16, marginBottom: 12,
   },
-  navBtnIcon: { fontSize: 20 },
-  navBtnText: { color: '#fff', fontSize: 16, fontWeight: '700' },
   closeBtn: { alignItems: 'center', paddingVertical: 12 },
-  closeBtnText: { fontSize: 15, fontWeight: '500' },
 });

@@ -13,10 +13,10 @@ module.exports = {
   scheme: 'nearbyfinder',
   newArchEnabled: false,
   icon: './assets/icon.png',
-  userInterfaceStyle: 'automatic',
+  userInterfaceStyle: 'dark',
   splash: {
     image: './assets/splash-icon.png',
-    backgroundColor: '#0a7ea4',
+    backgroundColor: '#0B1929',
     resizeMode: 'contain',
   },
   ios: {
@@ -30,14 +30,14 @@ module.exports = {
   },
   android: {
     package: 'com.nearbyfinder.app',
-    versionCode: 1,
+    versionCode: 7,
     config: {
       googleMaps: {
         apiKey: googleMapsKey,
       },
     },
     adaptiveIcon: {
-      backgroundColor: '#0a7ea4',
+      backgroundColor: '#0B1929',
       foregroundImage: './assets/android-icon-foreground.png',
       backgroundImage: './assets/android-icon-background.png',
       monochromeImage: './assets/android-icon-monochrome.png',
@@ -53,6 +53,8 @@ module.exports = {
   },
   plugins: [
     'expo-router',
+    'expo-font',
+    'expo-splash-screen',
     [
       'expo-location',
       {
@@ -64,6 +66,8 @@ module.exports = {
       'expo-build-properties',
       {
         android: {
+          targetSdkVersion: 36,
+          compileSdkVersion: 36,
           // ProGuard only for production Play Store builds — breaks Fabric in preview APKs
           enableProguardInReleaseBuilds: false,
           enableShrinkResourcesInReleaseBuilds: false,

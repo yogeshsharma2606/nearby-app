@@ -1,5 +1,4 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import { useColorScheme } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const THEME_KEY = '@nearby_finder_theme';
@@ -38,42 +37,42 @@ export interface AppTheme {
 }
 
 const LIGHT: AppTheme['colors'] = {
-  background: '#F0F4F8',
+  background: '#F8FAFC',
   card: '#FFFFFF',
   cardElevated: '#FFFFFF',
-  primary: '#0a7ea4',
-  primaryLight: '#E0F2FE',
-  textPrimary: '#0F172A',
-  textSecondary: '#475569',
-  textMuted: '#94A3B8',
+  primary: '#0D9488',
+  primaryLight: '#CCFBF1',
+  textPrimary: '#020617',
+  textSecondary: '#1E293B',
+  textMuted: '#334155',
   border: '#E2E8F0',
-  inputBackground: '#F8FAFC',
-  success: '#166534',
+  inputBackground: '#F1F5F9',
+  success: '#15803D',
   successLight: '#DCFCE7',
-  danger: '#991B1B',
+  danger: '#B91C1C',
   dangerLight: '#FEF2F2',
-  warning: '#92400E',
+  warning: '#B45309',
   warningLight: '#FFFBEB',
-  overlay: 'rgba(0,0,0,0.45)',
-  headerBackground: '#0a7ea4',
-  headerText: '#FFFFFF',
-  chipBackground: '#F1F5F9',
+  overlay: 'rgba(15,23,42,0.4)',
+  headerBackground: '#FFFFFF',
+  headerText: '#020617',
+  chipBackground: '#FFFFFF',
   chipBorder: '#CBD5E1',
-  chipText: '#475569',
-  chipSelectedBackground: '#E0F2FE',
-  chipSelectedBorder: '#0a7ea4',
-  chipSelectedText: '#0a7ea4',
+  chipText: '#1E293B',
+  chipSelectedBackground: '#F0FDFA',
+  chipSelectedBorder: '#0D9488',
+  chipSelectedText: '#115E59',
 };
 
 const DARK: AppTheme['colors'] = {
-  background: '#0F172A',
-  card: '#1E293B',
-  cardElevated: '#253347',
-  primary: '#38BDF8',
-  primaryLight: '#0C2A3A',
+  background: '#0B1120',
+  card: '#151F32',
+  cardElevated: '#1C2942',
+  primary: '#2DD4BF',
+  primaryLight: '#134E4A',
   textPrimary: '#F1F5F9',
   textSecondary: '#94A3B8',
-  textMuted: '#475569',
+  textMuted: '#64748B',
   border: '#334155',
   inputBackground: '#152032',
   success: '#4ADE80',
@@ -83,14 +82,14 @@ const DARK: AppTheme['colors'] = {
   warning: '#FCD34D',
   warningLight: '#2D1B02',
   overlay: 'rgba(0,0,0,0.65)',
-  headerBackground: '#1E293B',
-  headerText: '#F1F5F9',
-  chipBackground: '#1E293B',
-  chipBorder: '#475569',
+  headerBackground: '#151F32',
+  headerText: '#F8FAFC',
+  chipBackground: '#1C2942',
+  chipBorder: '#334155',
   chipText: '#CBD5E1',
-  chipSelectedBackground: '#38BDF8',
-  chipSelectedBorder: '#38BDF8',
-  chipSelectedText: '#0F172A',
+  chipSelectedBackground: '#1A3330',
+  chipSelectedBorder: '#2DD4BF',
+  chipSelectedText: '#99F6E4',
 };
 
 interface ThemeContextValue {
@@ -101,8 +100,7 @@ interface ThemeContextValue {
 const ThemeContext = createContext<ThemeContextValue | null>(null);
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const systemScheme = useColorScheme();
-  const [mode, setMode] = useState<ThemeMode>(systemScheme === 'dark' ? 'dark' : 'light');
+  const [mode, setMode] = useState<ThemeMode>('dark');
 
   useEffect(() => {
     AsyncStorage.getItem(THEME_KEY)

@@ -108,7 +108,7 @@ export default function MapWebScreen() {
         {selectedPlace && (
           <PlaceDetailSheet
             place={selectedPlace}
-            categoryEmoji={selectedCategory.emoji}
+            categoryId={selectedCategory.id}
             onClose={() => setSelectedPlace(null)}
             theme={theme}
           />

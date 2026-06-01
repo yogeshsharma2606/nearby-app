@@ -1,11 +1,10 @@
 import { useState, useCallback } from 'react';
 import * as Location from 'expo-location';
 import { fetchNearbyPumps, parseNodeDetails } from '../services/overpassService';
-import { fetchNearbyPlaces } from '../services/placesService';
+import { fetchPlacesForCategory } from '../services/placesService';
 import { getDrivingRoute } from '../services/osrmService';
 import { API_KEYS } from '../config/apiKeys';
 import type { PlaceCategory } from '../config/placeTypes';
-import { DEFAULT_CATEGORY } from '../config/placeTypes';
 import type { NearbyPlace } from '../types/place';
 
 export type FetchStatus = 'idle' | 'locating' | 'fetching' | 'routing' | 'done' | 'error';
@@ -16,7 +15,7 @@ export interface UseNearbyPlacesResult {
   status: FetchStatus;
   error: string | null;
   setError: (msg: string | null) => void;
-  selectedCategory: PlaceCategory;
+  selectedCategory: PlaceCategory | null;
   setSelectedCategory: (category: PlaceCategory) => void;
   /** Use device GPS then search */
   findPlaces: () => Promise<boolean>;
@@ -32,7 +31,7 @@ export function useNearbyPlaces(): UseNearbyPlacesResult {
   const [userLocation, setUserLocation] = useState<{ lat: number; lon: number } | null>(null);
   const [status, setStatus] = useState<FetchStatus>('idle');
   const [error, setError] = useState<string | null>(null);
-  const [selectedCategory, setSelectedCategoryRaw] = useState<PlaceCategory>(DEFAULT_CATEGORY);
+  const [selectedCategory, setSelectedCategoryRaw] = useState<PlaceCategory | null>(null);
 
   // Changing category clears stale results so the label always matches the data.
   const setSelectedCategory = useCallback((category: PlaceCategory) => {
@@ -54,13 +53,8 @@ export function useNearbyPlaces(): UseNearbyPlacesResult {
 
         if (hasGoogleKey) {
           // Google Places Nearby Search (primary)
-          const results = await fetchNearbyPlaces(
-            lat,
-            lon,
-            SEARCH_RADIUS_M,
-            category.googleType,
-            category.keyword,
-          );
+          const radiusM = category.searchRadiusM ?? SEARCH_RADIUS_M;
+          const results = await fetchPlacesForCategory(lat, lon, category, radiusM);
           preliminary = results.map((s, i) => ({
             id: i,
             name: s.name,
@@ -146,6 +140,12 @@ export function useNearbyPlaces(): UseNearbyPlacesResult {
     setError(null);
     setPlaces([]);
 
+    if (!selectedCategory) {
+      setError('Choose what you\'re looking for first.');
+      setStatus('idle');
+      return false;
+    }
+
     try {
       setStatus('locating');
 
@@ -176,7 +176,13 @@ export function useNearbyPlaces(): UseNearbyPlacesResult {
       setError(null);
       setPlaces([]);
       setUserLocation({ lat, lon });
-      return fetchForLocation(lat, lon, categoryOverride ?? selectedCategory);
+      const category = categoryOverride ?? selectedCategory;
+      if (!category) {
+        setError('Choose what you\'re looking for first.');
+        setStatus('idle');
+        return false;
+      }
+      return fetchForLocation(lat, lon, category);
     },
     [fetchForLocation, selectedCategory],
   );
